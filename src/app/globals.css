@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+
+
+body {
+
+  font-family: 'Poppins', sans-serif;
+  background: #ffff;
+
+}
+
+
+.font-mon {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Contact Page Styles (animations removed - using framer-motion) */
+.contact-form-panel {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-top: 3px solid #84B357;
+  border-left: 3px solid #84B357;
+}
+
+.contact-info-panel {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-top: 3px solid #84B357;
+  border-left: 3px solid #84B357;
+}
+
+.contact-info-item {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.contact-info-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.whatsapp-button {
+  width: 100%;
+  background: #25D366;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3);
+  text-decoration: none;
+}
+
+.whatsapp-button:hover {
+  background: #20BA5A;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(37, 211, 102, 0.4);
+}
