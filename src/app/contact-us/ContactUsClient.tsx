@@ -246,7 +246,7 @@ const ContactUsClient = () => {
                   </div>
                   <div>
                     <h3 className='font-semibold text-gray-800 mb-1 font-mon'>Email</h3>
-                    <p className='text-[#84B357] font-mon'>iskritipsychologysolutions@gmail.com</p>
+                    <p className='text-[#84B357] font-mon'>iskritipsychologysolutions <br  className='sm:block hidden'/>@gmail.com</p>
                   </div>
                 </div>
               </motion.div>
