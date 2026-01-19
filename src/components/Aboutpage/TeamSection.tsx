@@ -21,6 +21,8 @@ const TeamSection = () => {
     { id: 3, name: 'Mr. Priyanshu Sinha', role: 'Unity developer', image: '/team/priya.png' },
     { id: 4, name: 'Ms. Rasana Sherin', role: 'UX/UI Designer', image: '/team/raazana.png' },
     { id: 5, name: 'Ms. Shilpa', role: 'Creative Designer', image: '/team/shilpa.png' },
+    { id: 6, name: 'Mr. Masoom Sheikh', role: 'App Developer', image: '/team/masoom.png' },
+    { id: 7, name: 'Ms. Abhaya Bhadran', role: 'Tec Intern', image: '/team/abhaya.png' },
     // { id: 6, name: 'David Kim', role: 'Data Scientist', image: '/gentle.png' },
     // { id: 7, name: 'Rachel Brown', role: 'Product Manager', image: '/avatar.png' },
     // { id: 8, name: 'Mark Thompson', role: 'Backend Engineer', image: '/dp.png' },
