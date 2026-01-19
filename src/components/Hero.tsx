@@ -37,8 +37,8 @@ const Hero = () => {
             <span className='text-gray-800'>AI Therapist</span>
           </h1>
           <p className='sm:text-2xl text-xl text-black font-extralight leading-9 '>
-            A 24/7 AI therapy platform delivering real <br />-time conversations, CBT-based guidances <br />
-            with a human-like experience, designed for <br />
+            A 24/7 AI therapy platform delivering real <br />time conversations, CBT-based guidances <br />
+            with a human like experience, designed for <br />
             global scalability and equipped with a crisis <br />
             mode for smart escalation to human <br />
             support in high-risk situations.
