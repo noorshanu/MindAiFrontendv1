@@ -71,31 +71,31 @@ const Footer = () => {
             </h3>
             <nav className='flex flex-col space-y-2'>
               <Link
-                href='#'
+                href='/products'
                 className='text-white hover:text-[#000] transition-colors font-mon text-sm'
               >
                 AI Therapy Chat
               </Link>
               <Link
-                href='#'
+                href='/products'
                 className='text-white hover:text-[#000] transition-colors font-mon text-sm'
               >
                 VR Therapy Mode
               </Link>
               <Link
-                href='#'
+                href='/products'
                 className='text-white hover:text-[#000] transition-colors font-mon text-sm'
               >
                 Mood Prediction
               </Link>
               <Link
-                href='#'
+                href='/products'
                 className='text-white hover:text-[#000] transition-colors font-mon text-sm'
               >
                 Avatar Therapy
               </Link>
               <Link
-                href='#'
+                href='/products'
                 className='text-white hover:text-[#000] transition-colors font-mon text-sm'
               >
                 Exposure Therapy
