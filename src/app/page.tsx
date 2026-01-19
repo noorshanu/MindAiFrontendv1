@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
-import HomeConfetti from "@/components/HomeConfetti";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
@@ -39,7 +38,6 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <HomeConfetti />
       <Navbar/>
       <Hero/>
       <AboutUs/>
