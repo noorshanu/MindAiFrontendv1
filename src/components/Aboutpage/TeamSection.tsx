@@ -16,12 +16,12 @@ const TeamSection = () => {
   const [itemsPerSlide, setItemsPerSlide] = useState(1)
 
   const teamMembers: TeamMember[] = [
-    { id: 1, name: 'Ms. Vinitha Anil', role: 'Counselling Psychologist', image: '/team/vinitha.png' },
+    { id: 1, name: 'Mrs. Vinitha Anil Kumar', role: 'Counselling Psychologist', image: '/team/vinitha.png' },
     { id: 2, name: 'Mr. Noor Alam', role: 'Full Stack Developer', image: '/team/noorui.png' },
     { id: 3, name: 'Mr. Masoom Sheikh', role: 'App Developer', image: '/team/masoom.png' },
     { id: 4, name: 'Mr. Priyanshu Sinha', role: 'Unity developer', image: '/team/priya.png' },
     { id: 5, name: 'Ms. Rasana Sherin', role: 'UX/UI Designer', image: '/team/raazana.png' },
-    { id: 6, name: 'Ms. Shilpa', role: 'Creative Designer', image: '/team/shilpa.png' },
+    { id: 6, name: 'Mrs. Shilpa Ajeesh', role: 'Creative Designer', image: '/team/shilpa.png' },
     { id: 7, name: 'Ms. Abhaya Bhadran', role: 'Tec Intern', image: '/team/abhaya.png' },
   ]
 
