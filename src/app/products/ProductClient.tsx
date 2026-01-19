@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { FaComments, FaVrCardboard, FaChartLine, FaUser, FaShieldAlt, FaArrowRight } from 'react-icons/fa'
 import Appdownload from '@/components/Appdownload'
+import MobileAppGallary from '@/components/MobileAppGallary'
 
 const ProductClient = () => {
   return (
@@ -165,6 +166,7 @@ const ProductClient = () => {
           </div>
         </div>
       </div>
+      <MobileAppGallary />
       <Appdownload />
       <Footer />
     </>
