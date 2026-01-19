@@ -19,7 +19,7 @@ const Appdownload = () => {
   return (
     <section className='relative py-16 px-4 overflow-hidden'>
       {/* Background */}
-      <div className='absolute  right-0 sm:top-16  sm:bottom-0 bottom-16'>
+      <div className='absolute  right-0 sm:top-16   sm:bottom-0 bottom-2'>
         <Image
           src="/bgbg.png"
           alt="Background"

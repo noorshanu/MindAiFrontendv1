@@ -76,7 +76,7 @@ const Features = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6 }}
-      className='features-section py-16 px-4 bg-white'
+      className='features-section py-16 px-4 bg-white overflow-hidden'
     >
       <div className='container mx-auto max-w-7xl'>
         {/* Header */}

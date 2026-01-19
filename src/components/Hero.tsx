@@ -21,7 +21,7 @@ const Hero = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className='hero-section sm:py-16 py-8 px-4'
+      className='hero-section sm:py-16 py-8 px-4 overflow-hidden'
     >
       <div className='container mx-auto max-w-7xl flex flex-col sm:flex-row justify-between gap-12 items-center'>
         {/* Left Section - Text Content */}

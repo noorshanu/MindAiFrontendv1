@@ -8,14 +8,14 @@ const VisionMission = () => {
     <section className='vision-mission-section py-16 px-4 bg-white'>
       <div className='container mx-auto max-w-7xl'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-12'>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className='vision-card'
           >
-            <div className='bg-gradient-to-br from-[#84B357] to-[#6a8f45] p-8 rounded-2xl text-white shadow-xl'>
+            <div className='bg-gradient-to-br from-[#84B357] to-[#6a8f45] p-8 rounded-3xl text-white shadow-xl'>
               <div className='w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6'>
                 <svg className='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
@@ -23,14 +23,17 @@ const VisionMission = () => {
                 </svg>
               </div>
               <h3 className='text-3xl font-bold font-mon mb-4'>Our Vision</h3>
-              <p className='text-lg leading-7 font-mon'>
-                To create a world where mental health support is accessible, personalized, and available 
-                to everyone, regardless of their location, background, or circumstances. We envision a 
-                future where technology and compassion work together to transform mental health care.
+              <p className='text-lg leading-7 font-thin italic'>
+                A world where no one has to pretend they’re okay. Where silence doesn’t
+                 mean strength, and asking for help isn’t a last option it’s a normal one.
+                  We imagine a future where technology doesn’t replace human warmth, but holds
+                   space until humans can reach each other. Mind’s AI dreams of being that quiet 
+                   presence the one that listens when the world doesn’t, the one that stays when 
+                   everything feels heavy, the one that reminds you you’re not broken, you’re becoming.
               </p>
             </div>
           </motion.div>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -44,10 +47,10 @@ const VisionMission = () => {
                 </svg>
               </div>
               <h3 className='text-3xl font-bold font-mon mb-4'>Our Mission</h3>
-              <p className='text-lg leading-7 font-mon'>
-                To leverage cutting-edge AI technology to provide personalized, evidence-based mental health 
-                support that is accessible, affordable, and effective. We are committed to maintaining the 
-                highest standards of privacy, security, and ethical AI practices while helping individuals 
+              <p className='text-lg leading-7 font-thin italic'>
+                To leverage cutting-edge AI technology to provide personalized, evidence-based mental health
+                support that is accessible, affordable, and effective. We are committed to maintaining the
+                highest standards of privacy, security, and ethical AI practices while helping individuals
                 achieve better mental well-being.
               </p>
             </div>

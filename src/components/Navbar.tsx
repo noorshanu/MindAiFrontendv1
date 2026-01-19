@@ -60,7 +60,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className="w-full bg-white px-6 py-4 shadow-sm relative z-50">
+      <nav className="w-full bg-white px-6 py-4 shadow-sm relative z-50 overflow-hidden">
         {/* Logo */}
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center">
@@ -313,7 +313,7 @@ export const Navbar = () => {
 
           {/* Mobile Buttons */}
           <div className="p-6 border-t space-y-3">
-            <Link
+            {/* <Link
               href="/signup"
               onClick={closeMenu}
               className="block w-full bg-[#4CAF50] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#45a049] transition-colors shadow-md text-center"
@@ -326,23 +326,36 @@ export const Navbar = () => {
               className="block w-full bg-[#4CAF50] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#45a049] transition-colors shadow-md text-center"
             >
               LOGIN
-            </Link>
-            <Link
-              href="/dashboard"
-              onClick={closeMenu}
-              className="flex items-center justify-center gap-3 px-6 py-3 text-[#2C5F5D] hover:bg-[#84B357] hover:bg-opacity-10 transition-colors rounded-lg"
-            >
-              <div className="w-10 h-10 rounded-full bg-[#FF6B6B] flex items-center justify-center overflow-hidden shadow-md">
-                <Image
-                  src="/dp.png"
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="font-medium font-mon">Profile</span>
-            </Link>
+            </Link> */}
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.instagram.com/_minds_ai?igsh=NGd3emszeDBqY3Fq"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#2C5F5D] hover:text-[#84B357] transition-colors"
+                aria-label="Instagram"
+              >
+                <FaInstagram className="w-6 h-6" />
+                </a>
+              <a
+                href="https://www.linkedin.com/company/iskrti-psychology-solutions/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#2C5F5D] hover:text-[#84B357] transition-colors"
+                aria-label="LinkedIn"
+              >
+                <FaLinkedin className="w-6 h-6" />
+              </a>
+              <a
+                href="https://x.com/Minds_Ai_"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#2C5F5D] hover:text-[#84B357] transition-colors"
+                aria-label="X (Twitter)"
+              >
+                <FaXTwitter className="w-6 h-6" />
+              </a>
+            </div>
           </div>
         </div>
       </div>

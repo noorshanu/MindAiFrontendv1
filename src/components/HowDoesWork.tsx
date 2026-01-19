@@ -10,7 +10,7 @@ const HowDoesWork = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6 }}
-      className='howdoeswork-section py-16 px-4 bg-white'
+      className='howdoeswork-section py-16 px-4 bg-white overflow-hidden'
     >
       <div className='container mx-auto max-w-7xl'>
         {/* Title */}
@@ -22,7 +22,7 @@ const HowDoesWork = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className='howdoeswork-title text-2xl sm:text-5xl font-semibold text-center sm:mb-40 mb-10'
           >
-            How does MIND&apos;S AI <span className='text-black bg-[#84B357] font-thin pl-3 pr-5 py-2 rounded-2xl ml-2'> WORK?</span>
+            How does MIND&apos;S AI <span className='text-black bg-[#84B357] font-thin pl-3 pr-5 py-2 rounded-2xl ml-2 leading-14'> WORK?</span>
           </motion.h2>
         </div>
 
@@ -45,7 +45,7 @@ const HowDoesWork = () => {
                 AI Powered
               </h3>
 
-              <p className='text-black text-xl font-light leading-relaxed pt-3'>
+              <p className='text-black text-xl font-light leading-relaxed sm:pt-3 py-6'>
               Auto-detect your mental state <br />   Get immediate guidance
               </p>
       
@@ -69,7 +69,7 @@ const HowDoesWork = () => {
                 Effortless
               </h3>
 
-              <p className='text-black text-xl font-light leading-relaxed pt-3'>
+              <p className='text-black text-xl font-light leading-relaxed sm:pt-3 py-6'>
           3-second check-in <br />   No typing <br /> Intuitive UX
               </p>
              
@@ -87,11 +87,11 @@ const HowDoesWork = () => {
 
             {/* Content */}
             <div className='relative z-10 pt-4'>
-              <Image src="/right.png" alt="Radically private" width={200} height={250} className='w-[280px] h-auto object-contain absolute top-[-30px] left-0  mx-auto sm:rotate-[12deg] rotate-0'  />
+              <Image src="/right.png" alt="Radically private" width={200} height={250} className='w-[280px] h-auto object-contain absolute top-[-30px] left-0 right-0 sm:right-auto  mx-auto sm:rotate-[12deg] rotate-0'  />
               <h3 className='text-2xl sm:text-5xl font-normal text-black  mb-6 relative py-13'>
                 Radically private
               </h3>
-              <p className='text-black text-xl font-light leading-relaxed pt-3'>
+              <p className='text-black text-xl font-light leading-relaxed sm:pt-3 py-6'>
               No registration <br />   No personal data <br /> No ads, only AI therapy
               </p>
             </div>

@@ -58,6 +58,14 @@ const TeamSection = () => {
     return () => clearInterval(interval)
   }, [totalSlides])
 
+  const goToPrevious = () => {
+    setCurrentTeamIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1))
+  }
+
+  const goToNext = () => {
+    setCurrentTeamIndex((prev) => (prev + 1) % totalSlides)
+  }
+
   return (
     <section className='team-section py-16 px-4'>
       <div className='container mx-auto max-w-7xl'>
@@ -80,9 +88,31 @@ const TeamSection = () => {
           Meet the talented individuals who make Mind&apos;s AI possible. Our diverse team of psychologists, 
           developers, designers, and researchers work together to create innovative mental health solutions.
         </motion.p>
-        <div className='team-slider-container overflow-hidden'>
+        <div className='team-slider-container overflow-hidden relative'>
+          {/* Previous Button */}
+          <button
+            onClick={goToPrevious}
+            className='absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-[#84B357] hover:text-white text-[#2C5F5D] disabled:opacity-50 disabled:cursor-not-allowed'
+            aria-label='Previous slide'
+          >
+            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+            </svg>
+          </button>
+
+          {/* Next Button */}
+          <button
+            onClick={goToNext}
+            className='absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-[#84B357] hover:text-white text-[#2C5F5D] disabled:opacity-50 disabled:cursor-not-allowed'
+            aria-label='Next slide'
+          >
+            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+            </svg>
+          </button>
+
           <div 
-            className='team-grid flex transition-transform duration-500 ease-in-out'
+            className='team-grid flex transition-transform duration-500 ease-in-out px-12'
             style={{ transform: `translateX(-${currentTeamIndex * 100}%)` }}
           >
             {Array.from({ length: totalSlides }).map((_, slideIndex) => (

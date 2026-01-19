@@ -12,7 +12,7 @@ const AboutUs = () => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className='aboutus-section py-16 px-4 sm:mt-16 mt-0'
+            className='aboutus-section py-16 px-4 sm:mt-16 mt-0 overflow-hidden'
         >
             <div className='container mx-auto max-w-7xl'>
                 <motion.h2
