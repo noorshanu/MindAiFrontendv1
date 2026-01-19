@@ -13,7 +13,7 @@ const Footer = () => {
       {/* Content */}
       <div className='relative z-10 container mx-auto max-w-7xl px-4 pt-12 pb-8'>
         {/* Main Footer Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 sm:grid-cols-4 gap-8 mb-12'>
+        <div className='grid grid-cols-1 sm:grid-cols-4 gap-8 mb-12'>
           {/* Leftmost Section - Logo & Tagline */}
           <div>
             <Link href='/' className='inline-block mb-4'>
