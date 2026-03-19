@@ -11,20 +11,20 @@ import Appdownload from "@/components/Appdownload";
 
 export const metadata: Metadata = {
   title: "Home - AI-Powered Mental Wellness Platform",
-  description: "Mind's AI is a revolutionary 24/7 AI therapy platform delivering real-time conversations, CBT-based guidance with a human-like experience. Chat with Iskriti, your AI therapist, anytime, anywhere.",
+  description: "Mind's AI is a psychology-informed AI companion for emotional well-being. Real-time conversations, reflection, and supportive guidance — your AI friend and partner, anytime, anywhere. Not a substitute for professional care.",
   keywords: [
-    "AI therapy",
-    "online therapy",
-    "AI psychologist",
+    "AI companion",
+    "mental wellness",
+    "emotional support",
+    "psychology-informed",
     "mental health support",
-    "24/7 therapy",
-    "CBT therapy",
-    "AI counseling",
+    "AI friend",
+    "reflection",
     "mental wellness app"
   ],
   openGraph: {
-    title: "Mind's AI - Your Personal AI Therapist",
-    description: "A 24/7 AI therapy platform delivering real-time conversations, CBT-based guidance with a human-like experience.",
+    title: "Mind's AI - Your Psychology-Informed AI Companion",
+    description: "A psychology-informed AI companion for emotional well-being. Supportive conversations and reflection, anytime, anywhere.",
     images: ['/mobdown.png'],
   },
   twitter: {
