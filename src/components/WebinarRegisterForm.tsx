@@ -3,8 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Tooltip } from 'react-tooltip'
 
-// Base URL without trailing /api — e.g. http://localhost:4000 or https://api.mindsai.live
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.mindsai.live';
+//const API_BASE ="http://localhost:4000";
+const API_BASE ='https://api.mindsai.live';
 
 declare global {
   interface Window {
@@ -60,6 +60,13 @@ export function WebinarRegisterForm() {
   const [selectedPackageId, setSelectedPackageId] = useState<WebinarPackageId>('basic')
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
+
+  // Coupon
+  const [couponCodeInput, setCouponCodeInput] = useState<string>('')
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null)
+  const [couponAmountPaise, setCouponAmountPaise] = useState<number | null>(null)
+  const [couponError, setCouponError] = useState<string | null>(null)
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false)
 
   // Step 1: Basic information
   const [name, setName] = useState('')
@@ -127,9 +134,30 @@ export function WebinarRegisterForm() {
     }
   }, [selectedPackageId])
 
+  // Reset applied coupon when user changes the input or changes package.
+  useEffect(() => {
+    setAppliedCouponCode(null)
+    setCouponAmountPaise(null)
+    setCouponError(null)
+  }, [couponCodeInput, selectedPackageId])
+
   const selectedPackage = useMemo(() => {
     return packages.find((p) => p.id === selectedPackageId) || null
   }, [packages, selectedPackageId])
+
+  const fallbackPackageAmountPaise = useMemo(() => {
+    // Used only before packages are fetched.
+    const map: Record<WebinarPackageId, number> = {
+      basic: 9900,
+      pro: 29900,
+      premium: 99900,
+    }
+    return map[selectedPackageId]
+  }, [selectedPackageId])
+
+  const payAmountPaise = couponAmountPaise ?? selectedPackage?.amountPaise ?? fallbackPackageAmountPaise
+
+  const payRupees = Math.round(payAmountPaise / 100)
 
   const packageDetails = useMemo(() => {
     const map: Record<WebinarPackageId, { title: string; points: string[] }> = {
@@ -168,6 +196,7 @@ export function WebinarRegisterForm() {
           joinEarlyCommunity,
           consentUpdates,
           packageId: selectedPackageId,
+          couponCode: appliedCouponCode || undefined,
           message: message.trim() || undefined,
           razorpay_payment_id: paymentId,
           razorpay_order_id: orderId,
@@ -271,6 +300,10 @@ export function WebinarRegisterForm() {
 
     // Only submit on step 3 (payment)
     if (!validateStep3()) return
+    if (couponCodeInput.trim() && !appliedCouponCode) {
+      setError('Please apply the coupon before payment.')
+      return
+    }
 
     try {
       setIsSubmitting(true)
@@ -279,7 +312,11 @@ export function WebinarRegisterForm() {
       const orderRes = await fetch(`${API_BASE.replace(/\/api\/?$/, '')}/api/webinar/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), packageId: selectedPackageId }),
+        body: JSON.stringify({
+          email: email.trim(),
+          packageId: selectedPackageId,
+          couponCode: appliedCouponCode || undefined,
+        }),
       })
       const orderData = await orderRes.json().catch(() => ({}))
       if (!orderRes.ok || orderData?.success === false) {
@@ -296,7 +333,7 @@ export function WebinarRegisterForm() {
         amount,
         currency,
         name: "Mind's AI",
-        description: 'Webinar Registration (₹1)',
+        description: `Webinar Registration (${payRupees} INR)`,
         order_id: orderId,
         prefill: { name: name.trim(), email: email.trim(), contact: phone.trim() },
         theme: { color: '#6B9E5A' },
@@ -326,6 +363,41 @@ export function WebinarRegisterForm() {
     }
   }
 
+  const applyCoupon = async () => {
+    const raw = couponCodeInput.trim()
+    if (!raw) {
+      setAppliedCouponCode(null)
+      setCouponAmountPaise(null)
+      setCouponError(null)
+      return
+    }
+    setIsApplyingCoupon(true)
+    setCouponError(null)
+    try {
+      const res = await fetch(`${API_BASE.replace(/\/api\/?$/, '')}/api/webinar/coupon/quote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ couponCode: raw, packageId: selectedPackageId }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data?.success === false) {
+        setAppliedCouponCode(null)
+        setCouponAmountPaise(null)
+        setCouponError(data?.error || 'Invalid coupon code.')
+        return
+      }
+
+      setAppliedCouponCode(data.couponCode || raw.toUpperCase())
+      setCouponAmountPaise(typeof data.finalAmountPaise === 'number' ? data.finalAmountPaise : null)
+    } catch {
+      setAppliedCouponCode(null)
+      setCouponAmountPaise(null)
+      setCouponError('Could not apply coupon. Please try again.')
+    } finally {
+      setIsApplyingCoupon(false)
+    }
+  }
+
   if (showSuccessPage) {
     return (
       <section id="register" className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
@@ -337,7 +409,7 @@ export function WebinarRegisterForm() {
 
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-gray-700 font-medium mb-3 text-center">
-              please use this link to join our group its mandotiry to join
+              please use this link to join our group its mandatory to join
             </p>
             <a
               href="https://chat.whatsapp.com/GzbJ662UZzm8lRQMBlCdy0?mode=gi_t"
@@ -672,6 +744,8 @@ export function WebinarRegisterForm() {
                 </label>
               </div>
 
+
+
               {/* Package selection (moved to end) */}
               <div className="rounded-xl border border-gray-200 bg-white p-4">
                 <p className="text-sm font-semibold text-gray-800 mb-3">Choose your package</p>
@@ -685,10 +759,10 @@ export function WebinarRegisterForm() {
                       p?.amountPaise != null
                         ? `₹${Math.round(p.amountPaise / 100)}`
                         : id === 'basic'
-                          ? '₹1'
+                          ? '₹99'
                           : id === 'pro'
-                            ? '₹2'
-                            : '₹3'
+                            ? '₹299'
+                            : '₹999'
                     const disabled = p ? !p.active : false
                     const active = selectedPackageId === id
                     const tooltipId = `pkg-${id}-tip`
@@ -744,6 +818,33 @@ export function WebinarRegisterForm() {
                   })}
                 </div>
               </div>
+                            {/* Coupon */}
+                            <div className="rounded-xl border border-gray-200 bg-white p-4">
+                <p className="text-sm font-semibold text-gray-800 mb-2">Have a coupon code?</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCodeInput}
+                    onChange={(e) => setCouponCodeInput(e.target.value)}
+                    placeholder="Enter coupon code"
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={applyCoupon}
+                    disabled={isApplyingCoupon || !couponCodeInput.trim()}
+                    className="px-4 rounded-lg font-medium text-white bg-[#6B9E5A] hover:bg-[#5d8b4e] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                  </button>
+                </div>
+                {couponError && <p className="mt-2 text-sm text-red-600">{couponError}</p>}
+                {appliedCouponCode && (
+                  <p className="mt-2 text-sm text-emerald-700">
+                    Coupon applied ({appliedCouponCode}). New price: ₹{payRupees}
+                  </p>
+                )}
+              </div>
 
               <div>
                 <label htmlFor="webinar-message" className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -770,12 +871,12 @@ export function WebinarRegisterForm() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || (!!couponCodeInput.trim() && !appliedCouponCode)}
                   className="flex-1 py-3.5 rounded-lg font-medium text-white bg-[#6B9E5A] hover:bg-[#5d8b4e] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting
                     ? 'Opening payment...'
-                    : `Pay ₹${selectedPackage ? Math.round(selectedPackage.amountPaise / 100) : selectedPackageId === 'basic' ? 1 : selectedPackageId === 'pro' ? 2 : 3} & Register`}
+                    : `Pay ₹${payRupees} & Register`}
                 </button>
               </div>
             </>
