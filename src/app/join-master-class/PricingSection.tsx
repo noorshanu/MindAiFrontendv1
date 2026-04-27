@@ -11,8 +11,8 @@ export function PricingSection() {
           Select the perfect plan for your learning journey
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-7 sm:p-8 flex flex-col">
+        <div className="flex flex-col justify-center items-center gap-6 lg:gap-8 ">
+          {/* <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-7 sm:p-8 flex flex-col">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Basic Pass</h3>
             <div className="mb-6">
               <p className="text-sm text-gray-400 line-through">₹500</p>
@@ -54,9 +54,9 @@ export function PricingSection() {
             >
               Get Basic Pass
             </Link>
-          </div>
+          </div> */}
 
-          <div className="relative rounded-2xl bg-[#77b53d] text-white shadow-xl p-7 sm:p-8 flex flex-col border border-emerald-500/40">
+          {/* <div className="relative rounded-2xl bg-[#77b53d] text-white shadow-xl p-7 sm:p-8 flex flex-col border border-emerald-500/40">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <span className="inline-flex items-center rounded-full bg-orange-500 px-4 py-1 text-xs font-semibold shadow">
                 Most Popular
@@ -99,13 +99,13 @@ export function PricingSection() {
             >
               Get Pro Pass
             </Link>
-          </div>
+          </div> */}
 
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-7 sm:p-8 flex flex-col">
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-7 sm:p-8 flex flex-col w-[400px]">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Premium Pass</h3>
             <div className="mb-6">
               <p className="text-sm text-gray-400 line-through">₹2999</p>
-              <p className="text-4xl font-extrabold text-gray-900">₹999</p>
+              <p className="text-4xl font-extrabold text-gray-900">₹1499</p>
             </div>
 
             <ul className="space-y-3 text-sm text-gray-700 mb-8">

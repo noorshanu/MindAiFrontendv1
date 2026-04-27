@@ -12,7 +12,7 @@ export function MasterclassSection() {
           </h2>
           <div className="space-y-5 text-gray-600 text-base sm:text-lg leading-relaxed">
             <p>
-              Artificial intelligence is rapidly transforming the psychology industry — from AI
+              Artificial intelligence is rapidly transforming the psychology industry from AI
               therapy assistants to gamified mental health platforms.
             </p>
             <p>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-const MASTERCLASS_START_MS = Date.parse("2026-03-29T15:30:00+05:30"); // 3:30 PM IST
+const MASTERCLASS_START_MS = Date.parse("2026-05-17T19:30:00+05:30"); // 7:30 PM IST
 
 export function HeroSection() {
   // Important: keep the initial render stable to avoid hydration mismatch.
@@ -53,15 +53,15 @@ export function HeroSection() {
         <div className="rounded-3xl border border-gray-200 bg-white px-5 py-5 sm:px-6 sm:py-6 shadow-sm">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <p className="text-xs text-gray-500 line-through mb-1">Actual Value: ₹999</p>
-              <p className="text-2xl sm:text-3xl font-extrabold leading-none text-[#77b53d]">
-                Special Price: ₹99
+              <p className="text-xs text-gray-500 line-through mb-1">Actual Value: ₹2999</p>
+              <p className="text-xl sm:text-2xl font-extrabold leading-none text-[#77b53d]">
+                Special Price: ₹1499
               </p>
             </div>
 
             <div className="text-right">
               <p className="text-sm text-gray-500">Limited Time</p>
-              <p className="mt-1 text-xs text-gray-500">Masterclass: 29 March 2026 • 3:30 PM</p>
+              <p className="mt-1 text-xs text-gray-500">Masterclass: 17 May 2026 • 7:30 PM</p>
               <div className="mt-1 inline-flex items-center gap-2 text-rose-500 font-semibold tabular-nums">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-100">
                   <svg

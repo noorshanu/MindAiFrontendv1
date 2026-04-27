@@ -3,8 +3,34 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Tooltip } from 'react-tooltip'
 
-//const API_BASE ="http://localhost:4000";
-const API_BASE ='https://api.mindsai.live';
+/**
+ * Public API base (no trailing /api). Same DB as admin webinar settings.
+ * Set NEXT_PUBLIC_API_BASE_URL in .env.local for local backend, e.g. http://localhost:4000
+ */
+const API_ROOT = (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.mindsai.live').replace(
+  /\/api\/?$/,
+  '',
+)
+
+/**
+ * MindAiBackend middleware wraps most 2xx bodies as:
+ * { success, statuscode, message, data: { ...payload fields } }
+ * so `packages` / `orderId` live under `data`, not the root. Merge up for the form.
+ */
+function unwrapWebinarResponse(raw: unknown): Record<string, unknown> {
+  if (!raw || typeof raw !== 'object') return {}
+  const o = raw as Record<string, unknown>
+  const inner = o['data']
+  if (inner !== null && inner !== undefined && typeof inner === 'object' && !Array.isArray(inner)) {
+    return { ...o, ...(inner as Record<string, unknown>) }
+  }
+  return o
+}
+
+function webinarErrorMessage(flat: Record<string, unknown>): string {
+  const err = flat['error']
+  return typeof err === 'string' && err.trim() ? err : 'Request failed'
+}
 
 declare global {
   interface Window {
@@ -57,6 +83,8 @@ function loadRazorpayScript(): Promise<typeof window.Razorpay> {
 
 export function WebinarRegisterForm() {
   const [packages, setPackages] = useState<WebinarPackage[]>([])
+  const [packagesLoaded, setPackagesLoaded] = useState(false)
+  const [packagesFetchFailed, setPackagesFetchFailed] = useState(false)
   const [selectedPackageId, setSelectedPackageId] = useState<WebinarPackageId>('basic')
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
@@ -114,25 +142,33 @@ export function WebinarRegisterForm() {
     let mounted = true
     ;(async () => {
       try {
-        const res = await fetch(`${API_BASE.replace(/\/api\/?$/, '')}/api/webinar/packages`)
-        const data = await res.json().catch(() => ({}))
+        const res = await fetch(`${API_ROOT}/api/webinar/packages`)
+        const raw = await res.json().catch(() => ({}))
+        const data = unwrapWebinarResponse(raw)
         if (!mounted) return
-        if (res.ok && data?.success && Array.isArray(data?.packages)) {
-          setPackages(data.packages as WebinarPackage[])
-          const exists = (data.packages as WebinarPackage[]).some((p) => p.id === selectedPackageId && p.active)
-          if (!exists) {
-            const firstActive = (data.packages as WebinarPackage[]).find((p) => p.active)
-            if (firstActive) setSelectedPackageId(firstActive.id)
-          }
+        if (res.ok && data.success !== false && Array.isArray(data.packages)) {
+          const fetched = data.packages as WebinarPackage[]
+          setPackages(fetched)
+          setPackagesFetchFailed(false)
+          setSelectedPackageId((current) => {
+            const exists = fetched.some((p) => p.id === current && p.active)
+            if (exists) return current
+            const firstActive = fetched.find((p) => p.active)
+            return firstActive?.id ?? current
+          })
+        } else {
+          setPackagesFetchFailed(true)
         }
       } catch {
-        // ignore; fallback to hardcoded selection
+        setPackagesFetchFailed(true)
+      } finally {
+        if (mounted) setPackagesLoaded(true)
       }
     })()
     return () => {
       mounted = false
     }
-  }, [selectedPackageId])
+  }, [])
 
   // Reset applied coupon when user changes the input or changes package.
   useEffect(() => {
@@ -141,23 +177,17 @@ export function WebinarRegisterForm() {
     setCouponError(null)
   }, [couponCodeInput, selectedPackageId])
 
+  const visiblePackages = useMemo(() => {
+    // Show only active packages configured from admin.
+    return packages.filter((p) => p.active)
+  }, [packages])
   const selectedPackage = useMemo(() => {
-    return packages.find((p) => p.id === selectedPackageId) || null
-  }, [packages, selectedPackageId])
+    return visiblePackages.find((p) => p.id === selectedPackageId) || null
+  }, [visiblePackages, selectedPackageId])
 
-  const fallbackPackageAmountPaise = useMemo(() => {
-    // Used only before packages are fetched.
-    const map: Record<WebinarPackageId, number> = {
-      basic: 9900,
-      pro: 29900,
-      premium: 99900,
-    }
-    return map[selectedPackageId]
-  }, [selectedPackageId])
+  const payAmountPaise = couponAmountPaise ?? selectedPackage?.amountPaise ?? 0
 
-  const payAmountPaise = couponAmountPaise ?? selectedPackage?.amountPaise ?? fallbackPackageAmountPaise
-
-  const payRupees = Math.round(payAmountPaise / 100)
+  const payRupees = Math.max(0, Math.round(payAmountPaise / 100))
 
   const packageDetails = useMemo(() => {
     const map: Record<WebinarPackageId, { title: string; points: string[] }> = {
@@ -179,7 +209,7 @@ export function WebinarRegisterForm() {
 
   const confirmRegistration = useCallback(
     async (paymentId: string, orderId: string, signature: string) => {
-      const res = await fetch(`${API_BASE.replace(/\/api\/?$/, '')}/api/webinar/confirm`, {
+      const res = await fetch(`${API_ROOT}/api/webinar/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -203,9 +233,10 @@ export function WebinarRegisterForm() {
           razorpay_signature: signature,
         }),
       })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok || data?.success === false) {
-        throw new Error(data?.error || 'Registration failed')
+      const raw = await res.json().catch(() => ({}))
+      const data = unwrapWebinarResponse(raw)
+      if (!res.ok || data.success === false) {
+        throw new Error(webinarErrorMessage(data) || 'Registration failed')
       }
       setStep(1)
       setName('')
@@ -238,6 +269,7 @@ export function WebinarRegisterForm() {
       consentUpdates,
       message,
       selectedPackageId,
+      appliedCouponCode,
     ],
   )
 
@@ -270,6 +302,10 @@ export function WebinarRegisterForm() {
   }
 
   const validateStep3 = () => {
+    if (!selectedPackage || visiblePackages.length === 0) {
+      setError('No active package is available right now. Please try again later.')
+      return false
+    }
     if (!familiarity) {
       setError('Please select how familiar you are with AI in Psychology.')
       return false
@@ -309,7 +345,7 @@ export function WebinarRegisterForm() {
       setIsSubmitting(true)
 
       // 1. Create order on backend (sends email to check if already registered)
-      const orderRes = await fetch(`${API_BASE.replace(/\/api\/?$/, '')}/api/webinar/create-order`, {
+      const orderRes = await fetch(`${API_ROOT}/api/webinar/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -318,13 +354,21 @@ export function WebinarRegisterForm() {
           couponCode: appliedCouponCode || undefined,
         }),
       })
-      const orderData = await orderRes.json().catch(() => ({}))
-      if (!orderRes.ok || orderData?.success === false) {
-        setError(orderData?.error || 'Could not start payment. Please try again.')
+      const orderRaw = await orderRes.json().catch(() => ({}))
+      const orderData = unwrapWebinarResponse(orderRaw)
+      if (!orderRes.ok || orderData.success === false) {
+        setError(webinarErrorMessage(orderData) || 'Could not start payment. Please try again.')
         return
       }
 
-      const { orderId, keyId, amount, currency } = orderData
+      const orderId = orderData.orderId as string
+      const keyId = orderData.keyId as string
+      const amount = orderData.amount as number
+      const currency = orderData.currency as string
+      if (!orderId || !keyId || typeof amount !== 'number' || !currency) {
+        setError('Invalid payment session from server. Please try again.')
+        return
+      }
 
       // 2. Load Razorpay script and open checkout
       const Razorpay = await loadRazorpayScript()
@@ -374,20 +418,25 @@ export function WebinarRegisterForm() {
     setIsApplyingCoupon(true)
     setCouponError(null)
     try {
-      const res = await fetch(`${API_BASE.replace(/\/api\/?$/, '')}/api/webinar/coupon/quote`, {
+      const res = await fetch(`${API_ROOT}/api/webinar/coupon/quote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ couponCode: raw, packageId: selectedPackageId }),
       })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok || data?.success === false) {
+      const couponRaw = await res.json().catch(() => ({}))
+      const data = unwrapWebinarResponse(couponRaw)
+      if (!res.ok || data.success === false) {
         setAppliedCouponCode(null)
         setCouponAmountPaise(null)
-        setCouponError(data?.error || 'Invalid coupon code.')
+        setCouponError(webinarErrorMessage(data) || 'Invalid coupon code.')
         return
       }
 
-      setAppliedCouponCode(data.couponCode || raw.toUpperCase())
+      const code =
+        typeof data.couponCode === 'string' && data.couponCode.trim()
+          ? data.couponCode
+          : raw.toUpperCase()
+      setAppliedCouponCode(code)
       setCouponAmountPaise(typeof data.finalAmountPaise === 'number' ? data.finalAmountPaise : null)
     } catch {
       setAppliedCouponCode(null)
@@ -404,7 +453,7 @@ export function WebinarRegisterForm() {
         <div className="max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">Thanks for registration</h2>
           <p className="text-center text-gray-600 mb-6">
-            Masterclass: <span className="font-semibold">29 March 2026 • 3:30 PM</span>
+            Masterclass: <span className="font-semibold">17 May 2026 • 7:30 PM</span>
           </p>
 
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -749,74 +798,73 @@ export function WebinarRegisterForm() {
               {/* Package selection (moved to end) */}
               <div className="rounded-xl border border-gray-200 bg-white p-4">
                 <p className="text-sm font-semibold text-gray-800 mb-3">Choose your package</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {(['basic', 'pro', 'premium'] as const).map((id) => {
-                    const p = packages.find((x) => x.id === id)
-                    const label =
-                      p?.name ||
-                      (id === 'basic' ? 'Basic Pass' : id === 'pro' ? 'Pro Pass' : 'Premium Pass')
-                    const amount =
-                      p?.amountPaise != null
-                        ? `₹${Math.round(p.amountPaise / 100)}`
-                        : id === 'basic'
-                          ? '₹99'
-                          : id === 'pro'
-                            ? '₹299'
-                            : '₹999'
-                    const disabled = p ? !p.active : false
-                    const active = selectedPackageId === id
-                    const tooltipId = `pkg-${id}-tip`
-                    const details = packageDetails[id]
+                {!packagesLoaded ? (
+                  <p className="text-sm text-gray-500">Loading packages...</p>
+                ) : visiblePackages.length === 0 ? (
+                  <p className="text-sm text-red-600">
+                    {packagesFetchFailed
+                      ? 'Package load failed. Please refresh or try again shortly.'
+                      : 'No active package is available right now.'}
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {visiblePackages.map((p) => {
+                      const id = p.id
+                      const label = p.name
+                      const amount = `₹${Math.round(p.amountPaise / 100)}`
+                      const active = selectedPackageId === id
+                      const tooltipId = `pkg-${id}-tip`
+                      const details = packageDetails[id]
 
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        disabled={disabled}
-                        onClick={() => setSelectedPackageId(id)}
-                        className={`rounded-lg border px-3 py-3 text-left transition ${
-                          active
-                            ? 'border-emerald-500 bg-emerald-50'
-                            : 'border-gray-200 bg-white hover:bg-gray-50'
-                        } disabled:opacity-60 disabled:cursor-not-allowed`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <div className="text-xs font-semibold text-gray-800">{label}</div>
-                            <div
-                              className={`mt-1 text-sm font-bold ${
-                                active ? 'text-emerald-700' : 'text-gray-900'
-                              }`}
-                            >
-                              {amount}
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setSelectedPackageId(id)}
+                          className={`rounded-lg border px-3 py-3 text-left transition ${
+                            active
+                              ? 'border-emerald-500 bg-emerald-50'
+                              : 'border-gray-200 bg-white hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="text-xs font-semibold text-gray-800">{label}</div>
+                              <div
+                                className={`mt-1 text-sm font-bold ${
+                                  active ? 'text-emerald-700' : 'text-gray-900'
+                                }`}
+                              >
+                                {amount}
+                              </div>
                             </div>
+                            <span
+                              data-tooltip-id={tooltipId}
+                              data-tooltip-html={`<div style="max-width:260px"><div style="font-weight:700;margin-bottom:6px">${details.title}</div><ul style="margin:0;padding-left:18px">${details.points.map((x) => `<li style=&quot;margin:2px 0&quot;>${x}</li>`).join('')}</ul></div>`}
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:text-gray-700"
+                              aria-label={`${label} info`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              i
+                            </span>
+                            <Tooltip
+                              id={tooltipId}
+                              place="top"
+                              style={{
+                                backgroundColor: '#111827',
+                                color: '#fff',
+                                borderRadius: 10,
+                                padding: '10px 12px',
+                                fontSize: 12,
+                                zIndex: 60,
+                              }}
+                            />
                           </div>
-                          <span
-                            data-tooltip-id={tooltipId}
-                            data-tooltip-html={`<div style="max-width:260px"><div style="font-weight:700;margin-bottom:6px">${details.title}</div><ul style="margin:0;padding-left:18px">${details.points.map((x) => `<li style=&quot;margin:2px 0&quot;>${x}</li>`).join('')}</ul></div>`}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:text-gray-700"
-                            aria-label={`${label} info`}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            i
-                          </span>
-                          <Tooltip
-                            id={tooltipId}
-                            place="top"
-                            style={{
-                              backgroundColor: '#111827',
-                              color: '#fff',
-                              borderRadius: 10,
-                              padding: '10px 12px',
-                              fontSize: 12,
-                              zIndex: 60,
-                            }}
-                          />
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
                             {/* Coupon */}
                             <div className="rounded-xl border border-gray-200 bg-white p-4">
@@ -871,7 +919,12 @@ export function WebinarRegisterForm() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting || (!!couponCodeInput.trim() && !appliedCouponCode)}
+                  disabled={
+                    isSubmitting ||
+                    !!couponCodeInput.trim() && !appliedCouponCode ||
+                    !selectedPackage ||
+                    visiblePackages.length === 0
+                  }
                   className="flex-1 py-3.5 rounded-lg font-medium text-white bg-[#6B9E5A] hover:bg-[#5d8b4e] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting
