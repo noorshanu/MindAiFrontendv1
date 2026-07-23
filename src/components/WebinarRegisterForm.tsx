@@ -62,6 +62,29 @@ interface RazorpayInstance {
 type WebinarPackageId = 'basic' | 'pro' | 'premium'
 type WebinarPackage = { id: WebinarPackageId; name: string; amountPaise: number; active: boolean }
 
+type CurrentWebinarEvent = {
+  eventKey: string
+  title: string
+  description?: string
+  startsAt?: string | null
+  registrationOpensAt?: string | null
+  registrationClosesAt?: string | null
+  status?: string
+  registrationOpen: boolean
+  registrationMessage?: string | null
+}
+
+function formatEventWhen(iso?: string | null) {
+  if (!iso) return null
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return null
+  return d.toLocaleString('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Asia/Kolkata',
+  })
+}
+
 function loadRazorpayScript(): Promise<typeof window.Razorpay> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') {
@@ -86,6 +109,7 @@ export function WebinarRegisterForm() {
   const [packagesLoaded, setPackagesLoaded] = useState(false)
   const [packagesFetchFailed, setPackagesFetchFailed] = useState(false)
   const [selectedPackageId, setSelectedPackageId] = useState<WebinarPackageId>('basic')
+  const [currentEvent, setCurrentEvent] = useState<CurrentWebinarEvent | null>(null)
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
 
@@ -150,6 +174,23 @@ export function WebinarRegisterForm() {
           const fetched = data.packages as WebinarPackage[]
           setPackages(fetched)
           setPackagesFetchFailed(false)
+          if (data.event && typeof data.event === 'object') {
+            const ev = data.event as Record<string, unknown>
+            setCurrentEvent({
+              eventKey: typeof ev.eventKey === 'string' ? ev.eventKey : '',
+              title: typeof ev.title === 'string' ? ev.title : 'Masterclass',
+              description: typeof ev.description === 'string' ? ev.description : '',
+              startsAt: typeof ev.startsAt === 'string' ? ev.startsAt : null,
+              registrationOpensAt:
+                typeof ev.registrationOpensAt === 'string' ? ev.registrationOpensAt : null,
+              registrationClosesAt:
+                typeof ev.registrationClosesAt === 'string' ? ev.registrationClosesAt : null,
+              status: typeof ev.status === 'string' ? ev.status : 'open',
+              registrationOpen: ev.registrationOpen !== false,
+              registrationMessage:
+                typeof ev.registrationMessage === 'string' ? ev.registrationMessage : null,
+            })
+          }
           setSelectedPackageId((current) => {
             const exists = fetched.some((p) => p.id === current && p.active)
             if (exists) return current
@@ -334,6 +375,14 @@ export function WebinarRegisterForm() {
     setShowSuccessPage(false)
     setError(null)
 
+    if (currentEvent && currentEvent.registrationOpen === false) {
+      setError(
+        currentEvent.registrationMessage ||
+          'Registration is closed for this webinar. Please check back for the next one.',
+      )
+      return
+    }
+
     // Only submit on step 3 (payment)
     if (!validateStep3()) return
     if (couponCodeInput.trim() && !appliedCouponCode) {
@@ -515,10 +564,34 @@ export function WebinarRegisterForm() {
   return (
     <section id="register" className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
       <div className="max-w-md mx-auto">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 uppercase tracking-wide text-center mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 uppercase tracking-wide text-center mb-2">
           Register Here
         </h2>
+        {currentEvent?.title ? (
+          <p className="text-center text-sm text-emerald-700 font-semibold mb-1">{currentEvent.title}</p>
+        ) : null}
+        {formatEventWhen(currentEvent?.startsAt) ? (
+          <p className="text-center text-xs text-gray-500 mb-6">
+            Starts {formatEventWhen(currentEvent?.startsAt)} IST
+          </p>
+        ) : (
+          <div className="mb-6" />
+        )}
 
+        {packagesLoaded && currentEvent && currentEvent.registrationOpen === false ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-6 text-center">
+            <p className="text-base font-semibold text-amber-900">Registration closed</p>
+            <p className="mt-2 text-sm text-amber-800">
+              {currentEvent.registrationMessage ||
+                'Signups for this webinar are closed. Watch this page for the next masterclass.'}
+            </p>
+            {formatEventWhen(currentEvent.registrationClosesAt) ? (
+              <p className="mt-2 text-xs text-amber-700">
+                Closed on {formatEventWhen(currentEvent.registrationClosesAt)}
+              </p>
+            ) : null}
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Stepper */}
           <div className="flex items-center justify-between text-xs font-medium text-gray-500">
@@ -868,7 +941,10 @@ export function WebinarRegisterForm() {
               </div>
                             {/* Coupon */}
                             <div className="rounded-xl border border-gray-200 bg-white p-4">
-                <p className="text-sm font-semibold text-gray-800 mb-2">Have a coupon code?</p>
+                <p className="text-sm font-semibold text-gray-800 mb-1">Have a coupon code?</p>
+                <p className="text-xs text-gray-500 mb-2">
+                  Enter a code from Mind&apos;s AI (if you have one), then tap Apply. Your package price updates to the discounted final amount.
+                </p>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -941,6 +1017,7 @@ export function WebinarRegisterForm() {
             </p>
           )}
         </form>
+        )}
       </div>
 
     </section>

@@ -2,7 +2,23 @@
 
 import React, { useState, useEffect } from 'react'
 
-const WEBINAR_DATE = new Date('2026-03-29T13:00:00+05:30')
+const API_ROOT = (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.mindsai.live').replace(
+  /\/api\/?$/,
+  '',
+)
+
+/** Fallback if API has no startsAt yet */
+const FALLBACK_WEBINAR_DATE = new Date('2026-03-29T13:00:00+05:30')
+
+function unwrap(raw: unknown): Record<string, unknown> {
+  if (!raw || typeof raw !== 'object') return {}
+  const o = raw as Record<string, unknown>
+  const inner = o['data']
+  if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
+    return { ...o, ...(inner as Record<string, unknown>) }
+  }
+  return o
+}
 
 function getTimeLeft(target: Date) {
   const now = new Date()
@@ -21,17 +37,64 @@ function pad(n: number) {
   return n.toString().padStart(2, '0')
 }
 
+function formatDateHeading(d: Date) {
+  return d.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Kolkata',
+  })
+}
+
+function formatTimeRange(d: Date) {
+  const start = d.toLocaleTimeString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata',
+  })
+  return `${start} IST`
+}
+
 export function WebinarCountdown() {
   const [mounted, setMounted] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(WEBINAR_DATE))
+  const [target, setTarget] = useState<Date>(FALLBACK_WEBINAR_DATE)
+  const [title, setTitle] = useState('Masterclass')
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(FALLBACK_WEBINAR_DATE))
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`${API_ROOT}/api/webinar/current-event`)
+        const raw = await res.json().catch(() => ({}))
+        const data = unwrap(raw)
+        const ev = (data.event && typeof data.event === 'object' ? data.event : data) as Record<
+          string,
+          unknown
+        >
+        if (cancelled) return
+        if (typeof ev.title === 'string' && ev.title.trim()) setTitle(ev.title.trim())
+        if (typeof ev.startsAt === 'string' && ev.startsAt) {
+          const d = new Date(ev.startsAt)
+          if (!Number.isNaN(d.getTime())) setTarget(d)
+        }
+      } catch {
+        // keep fallback date
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     setMounted(true)
-    const tick = () => setTimeLeft(getTimeLeft(WEBINAR_DATE))
+    const tick = () => setTimeLeft(getTimeLeft(target))
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [target])
 
   const units = [
     { value: mounted ? timeLeft.days : 0, label: 'Days' },
@@ -73,12 +136,11 @@ export function WebinarCountdown() {
             <p className="text-xs font-semibold tracking-[0.2em] text-emerald-400 uppercase mb-3">
               Save the date
             </p>
+            <p className="text-sm font-medium text-emerald-300/90 mb-1">{title}</p>
             <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-2">
-              29 March 2026
+              {formatDateHeading(target)}
             </p>
-            <p className="text-lg sm:text-xl font-semibold text-slate-300">
-              1:00 PM – 1:45 PM IST
-            </p>
+            <p className="text-lg sm:text-xl font-semibold text-slate-300">{formatTimeRange(target)}</p>
           </div>
         </div>
 
