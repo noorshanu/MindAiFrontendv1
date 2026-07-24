@@ -9,24 +9,25 @@ export function HeroSection() {
       {/* Left content */}
       <div className="flex-1 flex flex-col justify-center px-6 sm:px-9 lg:px-14 py-7 lg:py-10 max-w-4xl">
         <h1 className="text-xl sm:text-3xl font-extrabold leading-tight text-gray-900 mb-3">
-          5 days certificate course
+          India&apos;s First 7-Day AI × Psychology
           <br />
-          on mastering Ai for
+          <span className="text-[#77b53d]">Master Certification</span>
           <br />
-          <span className="text-[#77b53d]">Next Gen Professional</span>
-          <br />
-          <span className="text-[#77b53d]">Psychology Practice</span>
+          <span className="text-[#77b53d]">Workshop</span>
         </h1>
         <p className="text-[#475569] text-sm sm:text-base mb-5 max-w-3xl leading-relaxed">
-          Learn how to stay ahead in the AI-driven mental health future in just 5 days.
+          Discover how AI is becoming a powerful tool to support mental health professionals,
+          enhance psychological practice, improve research, and expand access to mental health
+          services—without replacing human empathy in just 7 days.
         </p>
 
         <ul className="space-y-2.5 text-sm sm:text-base text-[#334155] mb-5">
           {[
-            "AI + Psychology career roadmap",
-            "Hands-on tools & real-world exposure",
-            "Build your own mental health product idea",
-            "Certificate + portfolio project",
+            "Live Interactive Sessions",
+            "Build Real AI-Powered Psychology Projects",
+            "Industry Certification",
+            "Career Guidance",
+            "Capstone Presentation",
           ].map((point) => (
             <li key={point} className="flex items-center gap-3 leading-tight">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#77b53d] text-white text-sm">
@@ -52,7 +53,7 @@ export function HeroSection() {
       <div className="relative flex-1 min-h-[260px] md:min-h-[90vh]">
         <Image
           src="/web-hero.png"
-          alt="How AI will transform psychology careers webinar"
+          alt="India's First 7-Day AI × Psychology Master Certification Workshop"
           fill
           priority
           className="object-contain object-center sm:object-right"

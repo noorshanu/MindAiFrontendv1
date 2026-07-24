@@ -31,13 +31,14 @@ function formatInr(paise: number) {
 
 export function PricingSection() {
   const includedItems = [
-    '5-day live interactive sessions',
-    'Industry-recognized certificate',
-    'Daily assignments and capstone project',
-    'Lifetime community access',
-    'AI tools resource kit',
-    'Internship opportunities',
-    'Portfolio project for career advancement',
+    '7 Live Sessions',
+    'AI × Psychology Toolkit',
+    'Resource Vault',
+    'Prompt Library',
+    'Capstone Project',
+    'Career Session',
+    'Certificate',
+    'Community Access',
   ]
 
   const [priceLabel, setPriceLabel] = useState<string>('…')

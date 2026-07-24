@@ -22,11 +22,12 @@ const PhysologicalField = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold leading-tight text-[#0f172a] sm:text-2xl">
-                This workshop prepares you for what&apos;s coming next.
+                Who is this Workshop For?
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
-                Whether you&apos;re a student, practitioner or career-changer, understanding AI&apos;s role in
-                mental health is no longer optional—it&apos;s essential.
+                Designed for psychology students, counsellors, therapists, mental health and healthcare
+                professionals, educators, researchers, AI enthusiasts, college students, and working
+                professionals who want to explore how AI can ethically support psychological practice.
               </p>
             </div>
           </div>

@@ -7,6 +7,12 @@ const mentors = [
     image: "/masterclass/sai.png",
   },
   {
+    name: "Dr. Sriarthi Manoharan",
+    role: "Senior Psychology Associate",
+    image: "/masterclass/sriarthi.jpeg",
+    color: true,
+  },
+  {
     name: "Mr. Noor Alam",
     role: "AI Psychologist Developer",
     image: "/masterclass/noor1.png",
@@ -34,18 +40,19 @@ const MeetMentors = () => {
           Learn from industry experts at the intersection of AI and psychology
         </p>
 
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
           {mentors.map((m) => (
             <article
               key={m.name}
               className="overflow-hidden rounded-2xl border border-[#e6efe0] bg-white p-3 shadow-[0_6px_16px_rgba(15,23,42,0.08)] sm:p-4"
             >
-              <div className="relative mx-auto aspect-3/4 w-full max-w-[140px] sm:max-w-[160px]">
+              <div className="relative mx-auto aspect-3/4 w-full max-w-[140px] overflow-hidden rounded-xl sm:max-w-[160px]">
                 <Image
                   src={m.image}
                   alt={m.name}
                   fill
-                  className="object-contain object-top grayscale"
+                  quality={90}
+                  className={`object-cover object-top ${m.color ? "" : "grayscale"}`}
                   sizes="(min-width: 1024px) 160px, 45vw"
                 />
               </div>
